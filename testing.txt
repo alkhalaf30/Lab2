@@ -1,0 +1,93 @@
+import java.util.*;
+import java.io.*;
+import java.lang.*;
+
+public class testing{
+public static String[] fileCon = null;
+public static String normFile = null;
+
+public static void main (String[] args)
+{
+	String csvFile = "ALL_AML.csv";
+	BufferedReader br = null;
+	String line = "";
+	String cvsSplitBy = ",";
+	String test="";
+	int counter = 0;
+	try 
+	{
+		br = new BufferedReader(new FileReader(csvFile));
+        while ((line = br.readLine()) != null) 
+		{
+            // use comma as separator
+			fileCon = line.split(cvsSplitBy);
+			if(counter==0)
+		normFile=line +",Avg1,Stdev1,S2N_MED,tVal_MED,Avg2,Stdev2,S2N_MGL,tVal_MGL,Avg3,Stdev3,S2N_RHB,tVal_RHB,Avg4,Stdev4,S2N_EPD,tVal_EPD,Avg5,Stdev5,S2N_JPA,tVal_JPA\n”;
+			if(counter >0)
+			{
+				float t1 = 0;
+				float t11 = 0;
+				float t2 = 0;
+				float t22 = 0;
+				float t3 = 0;
+				float t33 = 0;
+				float t4 = 0;
+				float t44 = 0;
+				float t5 = 0;
+				float t55 = 0;
+					
+				normFile=normFile + fileCon[0] + ",";
+				for (int i =1; i <28;i++)
+				{
+					t1 = t1 + Float.parseFloat(fileCon[i]);
+					t11 = t11 + Float.parseFloat(fileCon[i]) * Float.parseFloat(fileCon[i]);
+					normFile=normFile + fileCon[i] + ",";
+				}
+				for (int i =28; i <39;i++)
+				{
+					t2 = t2 + Float.parseFloat(fileCon[i]);
+					t22 =t22 +  Float.parseFloat(fileCon[i]) * Float.parseFloat(fileCon[i]);
+					normFile=normFile + fileCon[i] + ",";
+				}
+
+				float avg1 = t1/27;
+				float avg2 = t2/11;
+				double stdev1 = Math.sqrt((27 * t11 - t1 * t1)/(27*26));
+				double stdev2 = Math.sqrt((11*t22 - t2 * t2)/(11*10));
+				double s2n1 = (avg1 - avg2)/(stdev1 + stdev2);
+				double s2n2 = (avg2 - avg1)/(stdev1 + stdev2);
+				double tVal1 = (avg1 - avg2)/ Math.sqrt(stdev1 * stdev1 / 27 + stdev2 * stdev2 / 11); 
+				double tVal2 = (avg2 - avg1)/ Math.sqrt(stdev1 * stdev1 / 27 + stdev2 * stdev2 / 11);
+				normFile = normFile + avg1 + "," + stdev1 + "," + s2n1 + "," + tVal1 + "," + avg2 + "," + stdev2 + "," + s2n2 + "," + tVal2 + "\n";  
+			}
+			counter++;
+		}
+		try(PrintWriter out = new PrintWriter( "test222.csv" )  )
+		{
+			out.println(normFile);
+		}
+	} 
+	catch (FileNotFoundException e) 
+	{
+        e.printStackTrace();
+    } 
+	catch (IOException e) 
+	{
+        e.printStackTrace();
+    } 
+	finally 
+	{
+        if (br != null) 
+		{
+			try 
+			{
+                br.close();
+            } 
+			catch (IOException e) 
+			{
+                e.printStackTrace();
+            }
+        }
+    }
+}
+}
